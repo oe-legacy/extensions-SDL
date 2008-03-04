@@ -1,0 +1,6 @@
+IF (SDL_FOUND)
+  INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
+ELSE (SDL_FOUND)
+  MESSAGE ("WARNING: Could not find SDL - depending targets will be disabled.")
+  SET(OE_MISSING_LIBS "${OE_MISSING_LIBS}, SDL")
+ENDIF (SDL_FOUND)
