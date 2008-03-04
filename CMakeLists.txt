@@ -5,5 +5,6 @@ ADD_LIBRARY(Extensions_SDL
 )
 
 TARGET_LINK_LIBRARIES(Extensions_SDL
+   Extensions_OpenGLRenderer
    ${SDL_LIBRARY}
 )
