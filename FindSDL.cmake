@@ -49,8 +49,8 @@ FIND_PATH(SDL_INCLUDE_DIR SDL.h
   /opt/csw/include 
   /opt/include/SDL
   /opt/include
-  ${PROJECT_SOURCE_DIR}/libraries/SDL/include
-  ${PROJECT_SOURCE_DIR}/libraries/SDL-1.2.11/include
+  ${OE_LIB_DIR}/SDL/include
+  ${OE_LIB_DIR}/SDL-1.2.11/include
   )
 # I'm not sure if I should do a special casing for Apple. It is 
 # unlikely that other Unix systems will find the framework path.
@@ -94,8 +94,8 @@ ELSE(${SDL_INCLUDE_DIR} MATCHES ".framework")
     /opt/local/lib
     /opt/csw/lib
     /opt/lib
-    ${PROJECT_SOURCE_DIR}/libraries/SDL/lib
-    ${PROJECT_SOURCE_DIR}/libraries/SDL-1.2.11/lib
+    ${OE_LIB_DIR}/SDL/lib
+    ${OE_LIB_DIR}/SDL-1.2.11/lib
     )
   # Non-OS X framework versions expect you to also dynamically link to 
   # SDLmain. This is mainly for Windows and OS X. Other platforms 
@@ -111,8 +111,8 @@ ELSE(${SDL_INCLUDE_DIR} MATCHES ".framework")
     /opt/local/lib
     /opt/csw/lib
     /opt/lib
-    ${PROJECT_SOURCE_DIR}/SDL/lib
-    ${PROJECT_SOURCE_DIR}/SDL-1.2.11/lib
+    ${OE_LIB_DIR}/SDL/lib
+    ${OE_LIB_DIR}/SDL-1.2.11/lib
     )
 ENDIF(${SDL_INCLUDE_DIR} MATCHES ".framework")
 
