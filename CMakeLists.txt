@@ -1,10 +1,11 @@
+SET( EXTENSION_NAME "Extensions_SDL")
 
-ADD_LIBRARY(Extensions_SDL
+ADD_LIBRARY( ${EXTENSION_NAME}
   Devices/SDLInput.cpp
   Display/SDLFrame.cpp
 )
 
-TARGET_LINK_LIBRARIES(Extensions_SDL
+TARGET_LINK_LIBRARIES( ${EXTENSION_NAME}
    Extensions_OpenGLRenderer
    ${SDL_LIBRARY}
 )
