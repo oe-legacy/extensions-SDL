@@ -108,6 +108,7 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             marg.state = state;
             marg.button = (MouseButton) (int) SDL_BUTTON(event.button.button);
             marg.type = (event.type == SDL_MOUSEBUTTONDOWN)?MouseButtonEventArg::PRESS:MouseButtonEventArg::RELEASE;
+            IMouse::mouseButtonEvent.Notify(marg);
             break;
         } // switch on event type
     } // while sdl event
