@@ -84,11 +84,9 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             // set key symbol and modifier
             karg.sym = (Key)    event.key.keysym.sym;
             karg.mod = (KeyMod) event.key.keysym.mod;
+            karg.type = (event.type == SDL_KEYDOWN)?KeyboardEventArg::PRESS:KeyboardEventArg::RELEASE;
             // notify event
-            if (event.type == SDL_KEYUP)
-                IKeyboard::keyUpEvent.Notify(karg);
-            else
-                IKeyboard::keyDownEvent.Notify(karg);
+            IKeyboard::keyEvent.Notify(karg);
             break;
         case SDL_MOUSEMOTION:
             // set mouse position and get button modifiers
@@ -109,10 +107,7 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             MouseButtonEventArg marg;
             marg.state = state;
             marg.button = (MouseButton) (int) SDL_BUTTON(event.button.button);
-            if (event.type == SDL_MOUSEBUTTONUP)
-                IMouse::mouseUpEvent.Notify(marg);
-            else
-                IMouse::mouseDownEvent.Notify(marg);
+            marg.type = (event.type == SDL_MOUSEBUTTONDOWN)?MouseButtonEventArg::PRESS:MouseButtonEventArg::RELEASE;
             break;
         } // switch on event type
     } // while sdl event
