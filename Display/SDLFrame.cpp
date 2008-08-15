@@ -30,11 +30,6 @@ SDLFrame::~SDLFrame() {
 
 }
 
-// type id. see EModule::IsTypeOf()
-bool SDLFrame::IsTypeOf(const std::type_info& inf) { 
-    return (typeid(SDLFrame) == inf || IFrame::IsTypeOf(inf));
-}
-
 bool SDLFrame::IsFocused() const {
     return ((SDL_GetAppState() & SDL_APPINPUTFOCUS) != 0);
 }
@@ -71,7 +66,7 @@ void SDLFrame::SetOptions(const FrameOption options) {
     if (!init) this->options = options;
 }
 
-void SDLFrame::Initialize() {
+void SDLFrame::Handle(InitializeEventArg arg) {
     // Initialize the video frame
     if (SDL_Init(SDL_INIT_VIDEO) < 0 )
         throw Exception("SDL_Init: " + string(SDL_GetError()));
@@ -90,7 +85,7 @@ void SDLFrame::Initialize() {
     init = true;
 }
 
-void SDLFrame::Process(const float deltaTime, const float percent){
+void SDLFrame::Handle(ProcessEventArg arg) {
     // Start by flipping the screen which is the
     // result from last engine loop.
     if (IsOptionSet(FRAME_OPENGL))
@@ -99,7 +94,7 @@ void SDLFrame::Process(const float deltaTime, const float percent){
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void SDLFrame::Deinitialize() {
+void SDLFrame::Handle(DeinitializeEventArg arg) {
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 

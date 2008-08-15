@@ -16,9 +16,15 @@
 // OpenEngine input device interfaces
 #include <Devices/IMouse.h>
 #include <Devices/IKeyboard.h>
+#include <Core/Event.h>
 
 namespace OpenEngine {
 namespace Devices {
+
+using OpenEngine::Core::Event;
+using OpenEngine::Core::InitializeEventArg;
+using OpenEngine::Core::ProcessEventArg;
+using OpenEngine::Core::DeinitializeEventArg;
 
 /**
  * SDL implementation of IMouse and IKeyboard.
@@ -34,17 +40,24 @@ private:
     SDL_Event        event;
     MouseState       state;
 
+    Event<KeyboardEventArg>    keyEvent;
+    Event<MouseMovedEventArg>  mouseMovedEvent;
+    Event<MouseButtonEventArg> mouseButtonEvent;
+
 public:
 
     SDLInput();
     ~SDLInput();
 
-    bool IsTypeOf(const std::type_info& inf);
-
     // IModule methods
-    void Initialize();
-    void Process(const float deltaTime, const float percent);
-    void Deinitialize();
+    void Handle(InitializeEventArg arg);
+    void Handle(ProcessEventArg arg);
+    void Handle(DeinitializeEventArg arg);
+
+    // Event lists
+    IEvent<KeyboardEventArg>&    KeyEvent();
+    IEvent<MouseMovedEventArg>&  MouseMovedEvent();
+    IEvent<MouseButtonEventArg>& MouseButtonEvent();
 
     // IMouse methods
     void HideCursor();

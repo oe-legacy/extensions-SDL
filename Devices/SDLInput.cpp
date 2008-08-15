@@ -17,9 +17,6 @@
 // OpenEngine logging library
 #include <Logging/Logger.h>
 
-// OpenEngine game engine
-#include <Core/IGameEngine.h>
-
 namespace OpenEngine {
 namespace Devices {
 
@@ -41,23 +38,12 @@ SDLInput::~SDLInput() {
 }
 
 /**
- * Type lookup function.
- *
- * @see IModule::IsTypeOf()
- */
-bool SDLInput::IsTypeOf(const std::type_info& inf) { 
-    return (typeid(SDLInput) == inf 
-            || IKeyboard::IsTypeOf(inf)
-            || IMouse::IsTypeOf(inf));
-}
-
-/**
  * Module initialization method.
  * Called once on engine start up after all modules have been loaded.
  *
  * @see IModule::Initialize()
  */
-void SDLInput::Initialize() {
+void SDLInput::Handle(InitializeEventArg arg) {
     // Check that SDL has been initialized (SDLFrame does it)
     if (!SDL_WasInit(SDL_INIT_VIDEO))
         logger.error << "SDL was not initialized" << logger.end;
@@ -70,14 +56,16 @@ void SDLInput::Initialize() {
  *
  * @see IModule::Process()
  */
-void SDLInput::Process(const float deltaTime, const float percent) {
+void SDLInput::Handle(ProcessEventArg arg) {
     KeyboardEventArg karg;
     MouseMovedEventArg mmarg;
     // Loop until there are no events left on the queue
     while(SDL_PollEvent(&event) && (SDL_GetAppState() & SDL_APPINPUTFOCUS )) {
         switch (event.type) {
         case SDL_QUIT:
-            OpenEngine::Core::IGameEngine::Instance().Stop();
+            // @todo what do we wish to do here? 
+            // OpenEngine::Core::IGameEngine::Instance().Stop();
+            logger.info << "Recived SDL_QUIT" << logger.end;
             break;
         case SDL_KEYDOWN:
         case SDL_KEYUP:
@@ -86,7 +74,7 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             karg.mod = (KeyMod) event.key.keysym.mod;
             karg.type = (event.type == SDL_KEYDOWN)?KeyboardEventArg::PRESS:KeyboardEventArg::RELEASE;
             // notify event
-            IKeyboard::keyEvent.Notify(karg);
+            keyEvent.Notify(karg);
             break;
         case SDL_MOUSEMOTION:
             // set mouse position and get button modifiers
@@ -95,7 +83,7 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             state.y = mmarg.y = event.motion.y;
             mmarg.dx = event.motion.xrel;
             mmarg.dy = event.motion.yrel;
-            IMouse::mouseMovedEvent.Notify(mmarg);
+            mouseMovedEvent.Notify(mmarg);
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
@@ -108,7 +96,7 @@ void SDLInput::Process(const float deltaTime, const float percent) {
             marg.state = state;
             marg.button = (MouseButton) (int) SDL_BUTTON(event.button.button);
             marg.type = (event.type == SDL_MOUSEBUTTONDOWN)?MouseButtonEventArg::PRESS:MouseButtonEventArg::RELEASE;
-            IMouse::mouseButtonEvent.Notify(marg);
+            mouseButtonEvent.Notify(marg);
             break;
         } // switch on event type
     } // while sdl event
@@ -120,9 +108,22 @@ void SDLInput::Process(const float deltaTime, const float percent) {
  *
  * @see IModule::Deinitialize()
  */
-void SDLInput::Deinitialize() {
+void SDLInput::Handle(DeinitializeEventArg arg) {
 
 }
+
+IEvent<KeyboardEventArg>& SDLInput::KeyEvent() {
+    return this->keyEvent;
+}
+
+IEvent<MouseMovedEventArg>& SDLInput::MouseMovedEvent() {
+    return this->mouseMovedEvent;
+}
+
+IEvent<MouseButtonEventArg>& SDLInput::MouseButtonEvent() {
+    return this->mouseButtonEvent;
+}
+
 
 /**
  * Hide the mouse cursor.

@@ -16,6 +16,10 @@
 namespace OpenEngine {
 namespace Display {
 
+using OpenEngine::Core::InitializeEventArg;
+using OpenEngine::Core::ProcessEventArg;
+using OpenEngine::Core::DeinitializeEventArg;
+
 /**
  * SDL implementation of IFrame.
  *
@@ -37,7 +41,6 @@ public:
     SDLFrame(int width = 640, int height = 480, 
              int depth = 32, FrameOption options = FrameOption());
     ~SDLFrame();
-    bool IsTypeOf(const std::type_info& inf);
 
     bool IsFocused() const;
 
@@ -51,9 +54,9 @@ public:
     void SetDepth(const int depth);
     void SetOptions(const FrameOption options);
 
-    void Initialize();
-    void Process(const float deltaTime, const float percent);
-    void Deinitialize();
+    void Handle(InitializeEventArg arg);
+    void Handle(ProcessEventArg arg);
+    void Handle(DeinitializeEventArg arg);
 
 };
 
