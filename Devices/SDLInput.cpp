@@ -49,7 +49,7 @@ void SDLInput::Handle(InitializeEventArg arg) {
         logger.error << "SDL was not initialized" << logger.end;
     
     haveJoystick = (SDL_NumJoysticks() > 0);
-    logger.info << "Joystick " << haveJoystick << logger.end;
+    logger.info << "Number of joysticks " << SDL_NumJoysticks() << logger.end;
     if (haveJoystick) {
 	SDL_JoystickEventState(SDL_ENABLE);
 	firstJoystick = SDL_JoystickOpen(0);
@@ -113,6 +113,8 @@ void SDLInput::Handle(ProcessEventArg arg) {
 	    JoystickAxisEventArg jarg;
 	    joystickState.axisState[event.jaxis.axis] = event.jaxis.value;
 	    jarg.state = joystickState;
+	    jarg.axis = event.jaxis.axis;
+	    jarg.value = event.jaxis.value;
 	    joystickAxisEvent.Notify(jarg);
 	    break;
 	}
@@ -122,6 +124,7 @@ void SDLInput::Handle(ProcessEventArg arg) {
             joystickState.buttons = (JoystickButton)(joystickState.buttons | 1<<event.jbutton.button);
             e.button = (JoystickButton)(1<<event.jbutton.button);
             e.state = joystickState;
+	    e.type = JoystickButtonEventArg::PRESS;
             joystickButtonEvent.Notify(e);
             break;
         }
@@ -130,22 +133,12 @@ void SDLInput::Handle(ProcessEventArg arg) {
             joystickState.buttons = (JoystickButton)(joystickState.buttons & ~(1<<event.jbutton.button));
             e.button = (JoystickButton)(1<<event.jbutton.button);
             e.state = joystickState;
+	    e.type = JoystickButtonEventArg::RELEASE;
             joystickButtonEvent.Notify(e);
             break;
         }
-
-
-	// case SDL_JOYBUTTONUP:
-	// case SDL_JOYBUTTONDOWN:
-	//     {
-	// 	JoystickButtonEventArg jarg;
-	// 	jarg.button = (JoystickButton)(1 << event.jbutton.button);
-		    
-	// 	joystickButtonEvent.Notify(jarg);
-		
-	// 	break;
-	//     }
-        } // switch on event type
+        
+	} // switch on event type
     } // while sdl event
 }
 
