@@ -45,8 +45,15 @@ SDLInput::~SDLInput() {
  */
 void SDLInput::Handle(InitializeEventArg arg) {
     // Check that SDL has been initialized (SDLFrame does it)
-    if (!SDL_WasInit(SDL_INIT_VIDEO))
+    if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
         logger.error << "SDL was not initialized" << logger.end;
+    
+    haveJoystick = (SDL_NumJoysticks() > 0);
+    logger.info << "Joystick " << haveJoystick << logger.end;
+    if (haveJoystick) {
+	SDL_JoystickEventState(SDL_ENABLE);
+	firstJoystick = SDL_JoystickOpen(0);
+    }
 }
 
 /**
@@ -59,6 +66,7 @@ void SDLInput::Handle(InitializeEventArg arg) {
 void SDLInput::Handle(ProcessEventArg arg) {
     KeyboardEventArg karg;
     MouseMovedEventArg mmarg;
+    
     // Loop until there are no events left on the queue
     while(SDL_PollEvent(&event) && (SDL_GetAppState() & SDL_APPINPUTFOCUS )) {
         switch (event.type) {
@@ -87,6 +95,7 @@ void SDLInput::Handle(ProcessEventArg arg) {
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
+	    {
             // set mouse position and get button modifiers
             state.buttons = (MouseButton) (int) SDL_GetMouseState(NULL, NULL);
             state.x = event.button.x;
@@ -98,6 +107,44 @@ void SDLInput::Handle(ProcessEventArg arg) {
             marg.type = (event.type == SDL_MOUSEBUTTONDOWN)?MouseButtonEventArg::PRESS:MouseButtonEventArg::RELEASE;
             mouseButtonEvent.Notify(marg);
             break;
+	    }
+
+	case SDL_JOYAXISMOTION:{
+	    JoystickAxisEventArg jarg;
+	    joystickState.axisState[event.jaxis.axis] = event.jaxis.value;
+	    jarg.state = joystickState;
+	    joystickAxisEvent.Notify(jarg);
+	    break;
+	}
+
+	case SDL_JOYBUTTONDOWN:{
+            JoystickButtonEventArg e;
+            joystickState.buttons = (JoystickButton)(joystickState.buttons | 1<<event.jbutton.button);
+            e.button = (JoystickButton)(1<<event.jbutton.button);
+            e.state = joystickState;
+            joystickButtonEvent.Notify(e);
+            break;
+        }
+        case SDL_JOYBUTTONUP:{
+            JoystickButtonEventArg e;
+            joystickState.buttons = (JoystickButton)(joystickState.buttons & ~(1<<event.jbutton.button));
+            e.button = (JoystickButton)(1<<event.jbutton.button);
+            e.state = joystickState;
+            joystickButtonEvent.Notify(e);
+            break;
+        }
+
+
+	// case SDL_JOYBUTTONUP:
+	// case SDL_JOYBUTTONDOWN:
+	//     {
+	// 	JoystickButtonEventArg jarg;
+	// 	jarg.button = (JoystickButton)(1 << event.jbutton.button);
+		    
+	// 	joystickButtonEvent.Notify(jarg);
+		
+	// 	break;
+	//     }
         } // switch on event type
     } // while sdl event
 }
@@ -123,6 +170,15 @@ IEvent<MouseMovedEventArg>& SDLInput::MouseMovedEvent() {
 IEvent<MouseButtonEventArg>& SDLInput::MouseButtonEvent() {
     return this->mouseButtonEvent;
 }
+
+IEvent<JoystickButtonEventArg>& SDLInput::JoystickButtonEvent() {
+    return this->joystickButtonEvent;
+}
+
+IEvent<JoystickAxisEventArg>& SDLInput::JoystickAxisEvent() {
+    return this->joystickAxisEvent;
+}
+
 
 
 /**

@@ -68,7 +68,7 @@ void SDLFrame::SetOptions(const FrameOption options) {
 
 void SDLFrame::Handle(InitializeEventArg arg) {
     // Initialize the video frame
-    if (SDL_Init(SDL_INIT_VIDEO) < 0 )
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0 )
         throw Exception("SDL_Init: " + string(SDL_GetError()));
 
     // Set SDL flags

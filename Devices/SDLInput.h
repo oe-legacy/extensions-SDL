@@ -16,6 +16,7 @@
 // OpenEngine input device interfaces
 #include <Devices/IMouse.h>
 #include <Devices/IKeyboard.h>
+#include <Devices/IJoystick.h>
 #include <Core/Event.h>
 
 namespace OpenEngine {
@@ -33,16 +34,23 @@ using OpenEngine::Core::DeinitializeEventArg;
  * file. Additional documentation is in the interface files IMouse.h
  * and IKeyboard.h
  */
-class SDLInput : public IKeyboard, public IMouse {
+    class SDLInput : public IKeyboard, public IMouse, public IJoystick {
 
 private:
 
     SDL_Event        event;
     MouseState       state;
 
+    JoystickState joystickState;
+
+    bool haveJoystick;
+    SDL_Joystick *firstJoystick;
+
     Event<KeyboardEventArg>    keyEvent;
     Event<MouseMovedEventArg>  mouseMovedEvent;
     Event<MouseButtonEventArg> mouseButtonEvent;
+    Event<JoystickButtonEventArg> joystickButtonEvent;
+    Event<JoystickAxisEventArg> joystickAxisEvent;
 
 public:
 
@@ -55,9 +63,11 @@ public:
     void Handle(DeinitializeEventArg arg);
 
     // Event lists
-    IEvent<KeyboardEventArg>&    KeyEvent();
-    IEvent<MouseMovedEventArg>&  MouseMovedEvent();
-    IEvent<MouseButtonEventArg>& MouseButtonEvent();
+    IEvent<KeyboardEventArg>&		KeyEvent();
+    IEvent<MouseMovedEventArg>&		MouseMovedEvent();
+    IEvent<MouseButtonEventArg>&	MouseButtonEvent();
+    IEvent<JoystickButtonEventArg>&	JoystickButtonEvent();
+    IEvent<JoystickAxisEventArg>&	JoystickAxisEvent();
 
     // IMouse methods
     void HideCursor();
