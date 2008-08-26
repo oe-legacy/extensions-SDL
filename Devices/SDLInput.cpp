@@ -17,13 +17,17 @@
 // OpenEngine logging library
 #include <Logging/Logger.h>
 
+#include <Core/Exceptions.h>
+
 namespace OpenEngine {
 namespace Devices {
+
+using OpenEngine::Core::Exception;
 
 /**
  * Class constructor.
  */
-SDLInput::SDLInput() {
+SDLInput::SDLInput() : haveJoystick(false) {
     // initialize mouse state
     state.x = 0;
     state.y = 0;
@@ -45,14 +49,18 @@ SDLInput::~SDLInput() {
  */
 void SDLInput::Handle(InitializeEventArg arg) {
     // Check that SDL has been initialized (SDLFrame does it)
-    if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
-        logger.error << "SDL was not initialized" << logger.end;
-    
+    if (!SDL_WasInit(SDL_INIT_VIDEO))
+        throw Exception("SDL video has not been initialized.");
+
+    // Initialize for joysticks
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     haveJoystick = (SDL_NumJoysticks() > 0);
-    logger.info << "Number of joysticks " << SDL_NumJoysticks() << logger.end;
     if (haveJoystick) {
-	SDL_JoystickEventState(SDL_ENABLE);
-	firstJoystick = SDL_JoystickOpen(0);
+        SDL_JoystickEventState(SDL_ENABLE);
+        firstJoystick = SDL_JoystickOpen(0);
+        logger.info << "Found joystick: " << SDL_JoystickName(0) << logger.end;
+        if (28 < SDL_JoystickNumAxes(firstJoystick))
+            throw Exception("No support for joysticks with more then 28 axis.");
     }
 }
 
@@ -66,6 +74,7 @@ void SDLInput::Handle(InitializeEventArg arg) {
 void SDLInput::Handle(ProcessEventArg arg) {
     KeyboardEventArg karg;
     MouseMovedEventArg mmarg;
+    SDL_Event event = {0};
     
     // Loop until there are no events left on the queue
     while(SDL_PollEvent(&event) && (SDL_GetAppState() & SDL_APPINPUTFOCUS )) {

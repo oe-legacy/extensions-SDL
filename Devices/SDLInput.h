@@ -34,11 +34,10 @@ using OpenEngine::Core::DeinitializeEventArg;
  * file. Additional documentation is in the interface files IMouse.h
  * and IKeyboard.h
  */
-    class SDLInput : public IKeyboard, public IMouse, public IJoystick {
+class SDLInput : public IKeyboard, public IMouse, public IJoystick {
 
-private:
+protected:
 
-    SDL_Event        event;
     MouseState       state;
 
     JoystickState joystickState;
