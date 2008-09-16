@@ -7,9 +7,11 @@
 // See the GNU General Public License for more details (see LICENSE). 
 //--------------------------------------------------------------------
 
-#include <Core/Exceptions.h>
 #include <Display/SDLFrame.h>
-#include <Meta/OpenGL.h>
+
+#include <Core/Exceptions.h>
+#include <Meta/OpenGL.h> //@todo: move gl code to renderer or renderingview
+
 #include <string>
 
 namespace OpenEngine {
@@ -34,20 +36,24 @@ bool SDLFrame::IsFocused() const {
     return ((SDL_GetAppState() & SDL_APPINPUTFOCUS) != 0);
 }
 
-int SDLFrame::GetWidth() const {
+unsigned int SDLFrame::GetWidth() const {
     return width;
 }
 
-int SDLFrame::GetHeight() const {
+unsigned int SDLFrame::GetHeight() const {
     return height;
 }
 
-int SDLFrame::GetDepth() const {
+unsigned int SDLFrame::GetDepth() const {
     return depth;
 }
 
 FrameOption SDLFrame::GetOptions() const {
     return options;
+}
+
+bool SDLFrame::GetOption(const FrameOption option) const {
+    return (option & GetOptions()) == option;
 }
 
 void SDLFrame::SetWidth(const int width) {
@@ -63,14 +69,20 @@ void SDLFrame::SetDepth(const int depth) {
 }
 
 void SDLFrame::SetOptions(const FrameOption options) {
-    if (!init) this->options = options;
+    bool reload = false;
+    if (options != this->options) reload = true;
+    this->options = options;
+    if (init && reload) {
+        CreateSurface();
+    }
 }
 
-void SDLFrame::Handle(InitializeEventArg arg) {
-    // Initialize the video frame
-    if (SDL_Init(SDL_INIT_VIDEO) < 0 )
-        throw Exception("SDL_Init: " + string(SDL_GetError()));
+void SDLFrame::ToggleOption(const FrameOption option) {
+    FrameOption opt = FrameOption(options ^ option);
+    SetOptions(opt);
+}
 
+void SDLFrame::CreateSurface() {
     // Set SDL flags
     Uint32 flags = options;
 
@@ -81,6 +93,22 @@ void SDLFrame::Handle(InitializeEventArg arg) {
     if (SDL_SetVideoMode(width, height, depth, flags) == NULL)
         throw Exception("SDL_SetVideoMode: " + string(SDL_GetError()));
 
+    /* @todo
+      use signaling to reload gl context objects
+      
+      see, user comment 2 on:
+      http://www.libsdl.org/cgi/docwiki.cgi/SDL_SetVideoMode
+      causes gl context to unload: textures and vertex arrays
+    */
+}
+
+void SDLFrame::Handle(InitializeEventArg arg) {
+    // Initialize the video frame
+    if (SDL_Init(SDL_INIT_VIDEO) < 0 )
+        throw Exception("SDL_Init: " + string(SDL_GetError()));
+
+    CreateSurface();
+
     // Set the private initialization flag
     init = true;
 }
@@ -90,6 +118,7 @@ void SDLFrame::Handle(ProcessEventArg arg) {
     // result from last engine loop.
     if (IsOptionSet(FRAME_OPENGL))
         SDL_GL_SwapBuffers();
+
     // Clear the screen and the depth buffer.
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }

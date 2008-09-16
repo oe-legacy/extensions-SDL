@@ -28,11 +28,11 @@ using OpenEngine::Core::DeinitializeEventArg;
 class SDLFrame : public IFrame {
 private:
     // Screen settings
-    int width;
-    int height;
-    int depth;
+    unsigned int width, height, depth;
     FrameOption options;
     bool init;
+    
+    void CreateSurface();
 
 public:
     /**
@@ -44,20 +44,21 @@ public:
 
     bool IsFocused() const;
 
-    int GetWidth() const;
-    int GetHeight() const;
-    int GetDepth() const;
+    unsigned int GetWidth() const;
+    unsigned int GetHeight() const;
+    unsigned int GetDepth() const;
     FrameOption GetOptions() const;
+    bool GetOption(const FrameOption option) const;
 
     void SetWidth(const int width);
     void SetHeight(const int height);
     void SetDepth(const int depth);
     void SetOptions(const FrameOption options);
+    void ToggleOption(const FrameOption option);
 
     void Handle(InitializeEventArg arg);
     void Handle(ProcessEventArg arg);
     void Handle(DeinitializeEventArg arg);
-
 };
 
 } // NS Display
