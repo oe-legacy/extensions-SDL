@@ -7,6 +7,15 @@
 // See the GNU General Public License for more details (see LICENSE). 
 //--------------------------------------------------------------------
 
+
+// Check that all the special OE_* flags are defined
+#ifndef OE_SAFE
+#error "OE_SAFE is not defined by the build system"
+#endif
+#ifndef OE_DEBUG_GL
+#error "OE_DEBUG_GL is not defined by the build system."
+#endif
+
 // necessary as SDL on mac needs to do a take over on main()
 #if __APPLE__
 #include <Meta/SDL.h> 
