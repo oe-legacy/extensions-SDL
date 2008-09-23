@@ -27,7 +27,12 @@ using OpenEngine::Core::Exception;
 /**
  * Class constructor.
  */
-SDLInput::SDLInput() : haveJoystick(false) {
+SDLInput::SDLInput()
+    : IKeyboard()
+    , IMouse()
+    , IJoystick()
+    , haveJoystick(false)
+{
     // initialize mouse state
     state.x = 0;
     state.y = 0;
