@@ -7,10 +7,8 @@
 // See the GNU General Public License for more details (see LICENSE). 
 //--------------------------------------------------------------------
 
-#include <Display/SDLFrame.h>
-
 #include <Core/Exceptions.h>
-#include <Meta/OpenGL.h> //@todo: move gl code to renderer or renderingview
+#include <Display/SDLFrame.h>
 
 #include <string>
 
@@ -118,9 +116,6 @@ void SDLFrame::Handle(ProcessEventArg arg) {
     // result from last engine loop.
     if (IsOptionSet(FRAME_OPENGL))
         SDL_GL_SwapBuffers();
-
-    // Clear the screen and the depth buffer.
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 void SDLFrame::Handle(DeinitializeEventArg arg) {
