@@ -94,7 +94,7 @@ void SDLInput::Handle(ProcessEventArg arg) {
             // set key symbol and modifier
             karg.sym = (Key)    event.key.keysym.sym;
             karg.mod = (KeyMod) event.key.keysym.mod;
-            karg.type = (event.type == SDL_KEYDOWN)?KeyboardEventArg::PRESS:KeyboardEventArg::RELEASE;
+            karg.type = (event.type == SDL_KEYDOWN) ? EVENT_PRESS : EVENT_RELEASE;
             // notify event
             keyEvent.Notify(karg);
             break;
@@ -118,7 +118,7 @@ void SDLInput::Handle(ProcessEventArg arg) {
             MouseButtonEventArg marg;
             marg.state = state;
             marg.button = (MouseButton) (int) SDL_BUTTON(event.button.button);
-            marg.type = (event.type == SDL_MOUSEBUTTONDOWN)?MouseButtonEventArg::PRESS:MouseButtonEventArg::RELEASE;
+            marg.type = (event.type == SDL_MOUSEBUTTONDOWN) ? EVENT_PRESS : EVENT_RELEASE;
             mouseButtonEvent.Notify(marg);
             break;
 	    }
