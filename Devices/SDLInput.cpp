@@ -22,7 +22,11 @@
 namespace OpenEngine {
 namespace Devices {
 
-using OpenEngine::Core::Exception;
+using Core::Event;
+using Core::InitializeEventArg;
+using Core::ProcessEventArg;
+using Core::DeinitializeEventArg;
+using Core::Exception;
 
 /**
  * Class constructor.

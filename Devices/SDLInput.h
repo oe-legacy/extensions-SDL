@@ -18,14 +18,10 @@
 #include <Devices/IKeyboard.h>
 #include <Devices/IJoystick.h>
 #include <Core/Event.h>
+#include <Core/IModule.h>
 
 namespace OpenEngine {
 namespace Devices {
-
-using OpenEngine::Core::Event;
-using OpenEngine::Core::InitializeEventArg;
-using OpenEngine::Core::ProcessEventArg;
-using OpenEngine::Core::DeinitializeEventArg;
 
 /**
  * SDL implementation of IMouse and IKeyboard.
@@ -34,7 +30,11 @@ using OpenEngine::Core::DeinitializeEventArg;
  * file. Additional documentation is in the interface files IMouse.h
  * and IKeyboard.h
  */
-class SDLInput : public IKeyboard, public IMouse, public IJoystick {
+class SDLInput
+    : public IKeyboard
+    , public IMouse
+    , public IJoystick
+    , public Core::IModule {
 
 protected:
 
@@ -45,28 +45,28 @@ protected:
     bool haveJoystick;
     SDL_Joystick *firstJoystick;
 
-    Event<KeyboardEventArg>    keyEvent;
-    Event<MouseMovedEventArg>  mouseMovedEvent;
-    Event<MouseButtonEventArg> mouseButtonEvent;
-    Event<JoystickButtonEventArg> joystickButtonEvent;
-    Event<JoystickAxisEventArg> joystickAxisEvent;
-
+    Core::Event<KeyboardEventArg>       keyEvent;
+    Core::Event<MouseMovedEventArg>     mouseMovedEvent;
+    Core::Event<MouseButtonEventArg>    mouseButtonEvent;
+    Core::Event<JoystickButtonEventArg> joystickButtonEvent;
+    Core::Event<JoystickAxisEventArg>   joystickAxisEvent;
+    
 public:
 
     SDLInput();
     ~SDLInput();
 
     // IModule methods
-    void Handle(InitializeEventArg arg);
-    void Handle(ProcessEventArg arg);
-    void Handle(DeinitializeEventArg arg);
+    void Handle(Core::InitializeEventArg arg);
+    void Handle(Core::ProcessEventArg arg);
+    void Handle(Core::DeinitializeEventArg arg);
 
     // Event lists
-    IEvent<KeyboardEventArg>&		KeyEvent();
-    IEvent<MouseMovedEventArg>&		MouseMovedEvent();
-    IEvent<MouseButtonEventArg>&	MouseButtonEvent();
-    IEvent<JoystickButtonEventArg>&	JoystickButtonEvent();
-    IEvent<JoystickAxisEventArg>&	JoystickAxisEvent();
+    Core::IEvent<KeyboardEventArg>&       KeyEvent();
+    Core::IEvent<MouseMovedEventArg>&     MouseMovedEvent();
+    Core::IEvent<MouseButtonEventArg>&    MouseButtonEvent();
+    Core::IEvent<JoystickButtonEventArg>& JoystickButtonEvent();
+    Core::IEvent<JoystickAxisEventArg>&	  JoystickAxisEvent();
 
     // IMouse methods
     void HideCursor();
