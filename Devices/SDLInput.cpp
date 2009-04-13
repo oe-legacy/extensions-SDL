@@ -127,22 +127,22 @@ void SDLInput::Handle(ProcessEventArg arg) {
             break;
 	    }
 
-	case SDL_JOYAXISMOTION:{
-	    JoystickAxisEventArg jarg;
-	    joystickState.axisState[event.jaxis.axis] = event.jaxis.value;
-	    jarg.state = joystickState;
-	    jarg.axis = event.jaxis.axis;
-	    jarg.value = event.jaxis.value;
-	    joystickAxisEvent.Notify(jarg);
-	    break;
-	}
+        case SDL_JOYAXISMOTION:{
+            JoystickAxisEventArg jarg;
+            joystickState.axisState[event.jaxis.axis] = event.jaxis.value;
+            jarg.state = joystickState;
+            jarg.axis = event.jaxis.axis;
+            jarg.value = event.jaxis.value;
+            joystickAxisEvent.Notify(jarg);
+            break;
+        }
 
-	case SDL_JOYBUTTONDOWN:{
+        case SDL_JOYBUTTONDOWN:{
             JoystickButtonEventArg e;
             joystickState.buttons = (JoystickButton)(joystickState.buttons | 1<<event.jbutton.button);
             e.button = (JoystickButton)(1<<event.jbutton.button);
             e.state = joystickState;
-	    e.type = JoystickButtonEventArg::PRESS;
+            e.type = JoystickButtonEventArg::PRESS;
             joystickButtonEvent.Notify(e);
             break;
         }

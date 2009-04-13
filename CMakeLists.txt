@@ -4,6 +4,7 @@ ADD_LIBRARY( ${EXTENSION_NAME}
   Display/SDLEnvironment.h
   Devices/SDLInput.h
   Devices/SDLInput.cpp
+  Devices/SDLJoystickOnly.cpp
   Display/SDLFrame.h
   Display/SDLFrame.cpp
 )
