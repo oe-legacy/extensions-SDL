@@ -61,6 +61,15 @@ void SDLInput::Handle(InitializeEventArg arg) {
     if (!SDL_WasInit(SDL_INIT_VIDEO))
         throw Exception("SDL video has not been initialized.");
 
+    // The event queue needs to be pulled in order for the
+    // SDL_WarpMouse method to work correctly.
+    SDL_Event event = {0};
+    while(SDL_PollEvent(&event) ) {
+        //@todo: which events are on the queue ?
+        logger.warning << "INITIAL SDL EVENT REMOVED FROM QUEUE";
+        logger.warning << logger.end;
+    }
+
     // Initialize for joysticks
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     haveJoystick = (SDL_NumJoysticks() > 0);
@@ -71,6 +80,8 @@ void SDLInput::Handle(InitializeEventArg arg) {
         if (28 < SDL_JoystickNumAxes(firstJoystick))
             throw Exception("No support for joysticks with more then 28 axis.");
     }
+
+    SDL_WarpMouse(state.x, state.y);
 }
 
 /**
@@ -219,8 +230,10 @@ void SDLInput::ShowCursor() {
  * @see IMouse::SetCursor()
  */
 void SDLInput::SetCursor(int x, int y) {
+    state.x = x;
+    state.y = y;
     if (SDL_GetAppState() & SDL_APPINPUTFOCUS)
-        SDL_WarpMouse(x, y);
+        SDL_WarpMouse(state.x, state.y);
 }
 
 /**
