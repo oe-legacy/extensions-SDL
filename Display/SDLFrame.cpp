@@ -9,6 +9,8 @@
 
 #include <Core/Exceptions.h>
 #include <Display/SDLFrame.h>
+#include <Display/StereoCamera.h>
+#include <Display/ViewingVolume.h>
 
 #include <string>
 
@@ -19,12 +21,16 @@ using OpenEngine::Core::Exception;
 using std::string;
     
 SDLFrame::SDLFrame(int width, int height, int depth, FrameOption options)
-    : IFrame(width, height, depth, options),
-      width(width),
-      height(height),
-      depth(depth),
-      options(FrameOption(options|FRAME_OPENGL)),
-      init(false) {}
+    : width(width)
+    , height(height)
+    , depth(depth)
+    , options(FrameOption(options|FRAME_OPENGL)) 
+    , init(false) 
+    , dummycam(new ViewingVolume())
+    , stereo(new StereoCamera(*dummycam))
+{
+
+}
 
 SDLFrame::~SDLFrame() {
 
@@ -54,15 +60,15 @@ bool SDLFrame::GetOption(const FrameOption option) const {
     return (option & GetOptions()) == option;
 }
 
-void SDLFrame::SetWidth(const int width) {
+void SDLFrame::SetWidth(const unsigned int width) {
     if (!init) this->width = width;
 }
 
-void SDLFrame::SetHeight(const int height) {
+void SDLFrame::SetHeight(const unsigned int height) {
     if (!init) this->height = height;
 }
 
-void SDLFrame::SetDepth(const int depth) {
+void SDLFrame::SetDepth(const unsigned int depth) {
     if (!init) this->depth = depth;
 }
 
@@ -100,7 +106,7 @@ void SDLFrame::CreateSurface() {
     */
 }
 
-void SDLFrame::Handle(InitializeEventArg arg) {
+void SDLFrame::Handle(Core::InitializeEventArg arg) {
     // Initialize the video frame
     if (SDL_Init(SDL_INIT_VIDEO) < 0 )
         throw Exception("SDL_Init: " + string(SDL_GetError()));
@@ -109,17 +115,29 @@ void SDLFrame::Handle(InitializeEventArg arg) {
 
     // Set the private initialization flag
     init = true;
+    initEvent.Notify(InitializeEventArg(*this));
 }
 
-void SDLFrame::Handle(ProcessEventArg arg) {
+void SDLFrame::Handle(Core::ProcessEventArg arg) {
     // Start by flipping the screen which is the
     // result from last engine loop.
+    redrawEvent.Notify(RedrawEventArg(*this, arg.start, arg.approx));
     if (IsOptionSet(FRAME_OPENGL))
         SDL_GL_SwapBuffers();
 }
 
-void SDLFrame::Handle(DeinitializeEventArg arg) {
+void SDLFrame::Handle(Core::DeinitializeEventArg arg) {
+    deinitEvent.Notify(DeinitializeEventArg(*this));
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
+}
+
+StereoCamera& SDLFrame::GetStereoCamera() const {
+    return *stereo;
+}
+
+void SDLFrame::SetViewingVolume(IViewingVolume* vv) {
+    this->vv = vv;
+    stereo->SetViewingVolume(*vv);
 }
 
 } // NS Display

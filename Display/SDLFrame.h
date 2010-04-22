@@ -16,10 +16,6 @@
 namespace OpenEngine {
 namespace Display {
 
-using OpenEngine::Core::InitializeEventArg;
-using OpenEngine::Core::ProcessEventArg;
-using OpenEngine::Core::DeinitializeEventArg;
-
 /**
  * SDL implementation of IFrame.
  *
@@ -31,6 +27,8 @@ private:
     unsigned int width, height, depth;
     FrameOption options;
     bool init;
+    IViewingVolume* dummycam;
+    StereoCamera* stereo;
     
     void CreateSurface();
 
@@ -50,15 +48,18 @@ public:
     FrameOption GetOptions() const;
     bool GetOption(const FrameOption option) const;
 
-    void SetWidth(const int width);
-    void SetHeight(const int height);
-    void SetDepth(const int depth);
+    void SetWidth(const unsigned int width);
+    void SetHeight(const unsigned int height);
+    void SetDepth(const unsigned int depth);
     void SetOptions(const FrameOption options);
     void ToggleOption(const FrameOption option);
 
-    void Handle(InitializeEventArg arg);
-    void Handle(ProcessEventArg arg);
-    void Handle(DeinitializeEventArg arg);
+    void Handle(Core::InitializeEventArg arg);
+    void Handle(Core::ProcessEventArg arg);
+    void Handle(Core::DeinitializeEventArg arg);
+
+    void SetViewingVolume(IViewingVolume* vv);
+    StereoCamera& GetStereoCamera() const;
 };
 
 } // NS Display

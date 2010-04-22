@@ -51,7 +51,7 @@ public:
         input->Handle(arg);
     }
 
-    IFrame&             GetFrame()    { return *frame; }
+    IFrame&             CreateFrame()    { return *frame; }
     Devices::IMouse*    GetMouse()    { return input; }
     Devices::IKeyboard* GetKeyboard() { return input; }
     Devices::IJoystick* GetJoystick() { return input; }
