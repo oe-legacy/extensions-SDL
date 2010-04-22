@@ -14,6 +14,8 @@
 
 #include <string>
 
+#include <Meta/OpenGL.h>
+
 namespace OpenEngine {
 namespace Display {
 
@@ -113,17 +115,35 @@ void SDLFrame::Handle(Core::InitializeEventArg arg) {
 
     CreateSurface();
 
+    // Clear the OpenGL frame buffer.
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
+    CHECK_FOR_GL_ERROR();
+
     // Set the private initialization flag
     init = true;
     initEvent.Notify(InitializeEventArg(*this));
 }
 
 void SDLFrame::Handle(Core::ProcessEventArg arg) {
+    
+    glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     // Start by flipping the screen which is the
     // result from last engine loop.
+    if (vv != NULL) {
+        vv->SignalRendering(arg.approx);
+
+        // Set viewport size 
+        Vector<4,int> d(0, 0, width, height);
+        glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
+        CHECK_FOR_GL_ERROR();
+
+    }
+    CHECK_FOR_GL_ERROR();
+
     redrawEvent.Notify(RedrawEventArg(*this, arg.start, arg.approx));
-    if (IsOptionSet(FRAME_OPENGL))
-        SDL_GL_SwapBuffers();
+
+    SDL_GL_SwapBuffers();
 }
 
 void SDLFrame::Handle(Core::DeinitializeEventArg arg) {
