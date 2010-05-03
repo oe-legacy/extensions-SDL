@@ -28,8 +28,8 @@ SDLFrame::SDLFrame(int width, int height, int depth, FrameOption options)
     , depth(depth)
     , options(FrameOption(options|FRAME_OPENGL)) 
     , init(false) 
-    , dummycam(new ViewingVolume())
-    , stereo(new StereoCamera(*dummycam))
+    , canvas(NULL)
+    , fc(FrameCanvas(*this))
 {
 
 }
@@ -121,43 +121,18 @@ void SDLFrame::Handle(Core::InitializeEventArg arg) {
 
     // Set the private initialization flag
     init = true;
-    initEvent.Notify(InitializeEventArg(*this));
+    ((IListener<Display::InitializeEventArg>*)canvas)->Handle(Display::InitializeEventArg(fc));
 }
 
 void SDLFrame::Handle(Core::ProcessEventArg arg) {
-    
-    glClearColor(bgc[0], bgc[1], bgc[2], bgc[3]);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    // Start by flipping the screen which is the
-    // result from last engine loop.
-    if (vv != NULL) {
-        vv->SignalRendering(arg.approx);
-
-        // Set viewport size 
-        Vector<4,int> d(0, 0, width, height);
-        glViewport((GLsizei)d[0], (GLsizei)d[1], (GLsizei)d[2], (GLsizei)d[3]);
-        CHECK_FOR_GL_ERROR();
-
-    }
-    CHECK_FOR_GL_ERROR();
-
-    redrawEvent.Notify(RedrawEventArg(*this, arg.start, arg.approx));
-
+    if (!canvas) return; 
+    ((IListener<Display::ProcessEventArg>*)canvas)->Handle(ProcessEventArg(fc, arg.start, arg.approx));
     SDL_GL_SwapBuffers();
 }
 
 void SDLFrame::Handle(Core::DeinitializeEventArg arg) {
-    deinitEvent.Notify(DeinitializeEventArg(*this));
+    ((IListener<Display::DeinitializeEventArg>*)canvas)->Handle(DeinitializeEventArg(fc));
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
-}
-
-StereoCamera& SDLFrame::GetStereoCamera() const {
-    return *stereo;
-}
-
-void SDLFrame::SetViewingVolume(IViewingVolume* vv) {
-    this->vv = vv;
-    stereo->SetViewingVolume(*vv);
 }
 
 } // NS Display

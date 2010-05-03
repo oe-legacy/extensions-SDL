@@ -11,6 +11,7 @@
 #define _SDL_FRAME_H_
 
 #include <Display/IFrame.h>
+#include <Display/ICanvas.h>
 #include <Meta/SDL.h>
 
 namespace OpenEngine {
@@ -23,13 +24,34 @@ namespace Display {
  */
 class SDLFrame : public IFrame {
 private:
+    class FrameCanvas: public ICanvas {
+    private:
+        IFrame& frame;
+    public:
+        FrameCanvas(IFrame& frame): frame(frame) {}
+        virtual ~FrameCanvas() {}
+        unsigned int GetWidth() const { return frame.GetWidth(); }
+        unsigned int GetHeight() const { return frame.GetHeight(); }
+        unsigned int GetDepth() const { return frame.GetDepth(); }
+        void SetWidth(const unsigned int width) { frame.SetWidth(width); }
+        void SetHeight(const unsigned int height) { frame.SetHeight(height); }
+        void SetDepth(const unsigned int depth) { frame.SetDepth(depth); }
+
+        void Handle(Display::InitializeEventArg arg) {}
+        void Handle(Display::DeinitializeEventArg arg) {}
+        void Handle(Display::ProcessEventArg arg) {}
+        void Handle(Display::ResizeEventArg arg) {}
+
+        ITexture2DPtr GetTexture() { return ITexture2DPtr(); }
+    };
+
     // Screen settings
     unsigned int width, height, depth;
     FrameOption options;
     bool init;
-    IViewingVolume* dummycam;
-    StereoCamera* stereo;
     
+    ICanvas* canvas;
+    FrameCanvas fc;
     void CreateSurface();
 
 public:
@@ -58,8 +80,8 @@ public:
     void Handle(Core::ProcessEventArg arg);
     void Handle(Core::DeinitializeEventArg arg);
 
-    void SetViewingVolume(IViewingVolume* vv);
-    StereoCamera& GetStereoCamera() const;
+    void SetCanvas(ICanvas* canvas) { this->canvas = canvas; }
+    ICanvas* GetCanvas() { return canvas; }
 };
 
 } // NS Display
