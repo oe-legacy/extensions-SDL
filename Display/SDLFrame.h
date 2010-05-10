@@ -32,10 +32,8 @@ private:
         virtual ~FrameCanvas() {}
         unsigned int GetWidth() const { return frame.GetWidth(); }
         unsigned int GetHeight() const { return frame.GetHeight(); }
-        unsigned int GetDepth() const { return frame.GetDepth(); }
         void SetWidth(const unsigned int width) { frame.SetWidth(width); }
         void SetHeight(const unsigned int height) { frame.SetHeight(height); }
-        void SetDepth(const unsigned int depth) { frame.SetDepth(depth); }
 
         void Handle(Display::InitializeEventArg arg) {}
         void Handle(Display::DeinitializeEventArg arg) {}
