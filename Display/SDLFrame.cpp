@@ -121,6 +121,7 @@ void SDLFrame::Handle(Core::InitializeEventArg arg) {
 
     // Set the private initialization flag
     init = true;
+    if (!canvas) return; 
     ((IListener<Display::InitializeEventArg>*)canvas)->Handle(Display::InitializeEventArg(fc));
 }
 
