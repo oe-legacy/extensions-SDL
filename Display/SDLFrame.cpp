@@ -30,6 +30,7 @@ SDLFrame::SDLFrame(int width, int height, int depth, FrameOption options)
     , init(false) 
     , canvas(NULL)
     , fc(FrameCanvas(*this))
+    , renderModule(NULL)
 {
 
 }
@@ -121,20 +122,33 @@ void SDLFrame::Handle(Core::InitializeEventArg arg) {
 
     // Set the private initialization flag
     init = true;
-    if (!canvas) return; 
-    ((IListener<Display::InitializeEventArg>*)canvas)->Handle(Display::InitializeEventArg(fc));
+    if (canvas) 
+        ((IListener<Display::InitializeEventArg>*)canvas)->Handle(Display::InitializeEventArg(fc));
+
+    if (renderModule)
+        ((IListener<Core::InitializeEventArg>*)renderModule)->Handle(arg);
 }
 
 void SDLFrame::Handle(Core::ProcessEventArg arg) {
-    if (!canvas) return; 
-    ((IListener<Display::ProcessEventArg>*)canvas)->Handle(ProcessEventArg(fc, arg.start, arg.approx));
+    if (canvas) 
+        ((IListener<Display::ProcessEventArg>*)canvas)->Handle(ProcessEventArg(fc, arg.start, arg.approx));
+    if (renderModule)
+        ((IListener<Core::ProcessEventArg>*)renderModule)->Handle(arg);
     SDL_GL_SwapBuffers();
 }
 
 void SDLFrame::Handle(Core::DeinitializeEventArg arg) {
-    ((IListener<Display::DeinitializeEventArg>*)canvas)->Handle(DeinitializeEventArg(fc));
+    if (canvas)
+        ((IListener<Display::DeinitializeEventArg>*)canvas)->Handle(DeinitializeEventArg(fc));
+    if (renderModule)
+        ((IListener<Core::DeinitializeEventArg>*)renderModule)->Handle(arg);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
+
+void SDLFrame::SetRenderModule(IModule* renderModule) {
+    this->renderModule = renderModule;
+}
+
 
 } // NS Display
 } // NS OpenGL

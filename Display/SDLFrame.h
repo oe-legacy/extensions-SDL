@@ -50,6 +50,7 @@ private:
     
     ICanvas* canvas;
     FrameCanvas fc;
+    IModule* renderModule;
     void CreateSurface();
 
 public:
@@ -80,6 +81,8 @@ public:
 
     void SetCanvas(ICanvas* canvas) { this->canvas = canvas; }
     ICanvas* GetCanvas() { return canvas; }
+
+    void SetRenderModule(IModule* renderModule);
 };
 
 } // NS Display
