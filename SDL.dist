@@ -1,7 +1,6 @@
 # source
-darcs /extensions/SDL                    http://openengine.dk/code/extensions/SDL
-darcs-dev /extensions/SDL                    fh.daimi.au.dk:/users/cgd/code/extensions/SDL
+git     /extensions/SDL                    git://github.com/oe-legacy/extensions-SDL.git
+git-dev /extensions/SDL                    git@github.com:oe-legacy/extensions-SDL.git
 
 # windows lib
 win32 /libraries http://openengine.dk/data/libraries/sdl-win32.zip
-
